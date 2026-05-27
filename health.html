@@ -466,11 +466,183 @@ main {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.15); }
+
+/* ── Macro Tracker ─────────────────────────────────────── */
+.macro-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px 20px 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.macro-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.macro-cal-summary { font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); }
+.macro-cal-summary strong { font-size: 16px; color: var(--text-primary); font-weight: 700; }
+.macro-goals-btn {
+  background: none; border: 1px solid var(--border); border-radius: 8px;
+  padding: 4px 10px; font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary);
+  cursor: pointer; transition: border-color 0.15s, color 0.15s;
+}
+.macro-goals-btn:hover { border-color: var(--border-strong); color: var(--text-secondary); }
+.macro-goals-panel {
+  display: none;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px; margin-bottom: 16px;
+  padding: 14px; background: var(--bg-secondary);
+  border-radius: 10px; border: 1px solid var(--border);
+}
+.macro-goals-panel.is-open { display: grid; }
+.macro-goals-field { display: flex; flex-direction: column; gap: 4px; }
+.macro-goals-field label {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary);
+}
+.macro-goals-field input {
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 10px;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+  color: var(--text-primary); width: 100%; transition: border-color 0.15s;
+}
+.macro-goals-field input:focus { outline: none; border-color: var(--accent); background: var(--bg-input-focus); }
+.macro-bars { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.macro-bar-row { display: grid; grid-template-columns: 60px 1fr 80px; align-items: center; gap: 10px; }
+.macro-bar-label {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.10em; text-transform: uppercase; color: var(--text-secondary);
+}
+.macro-bar-track { height: 7px; border-radius: 99px; background: rgba(255,255,255,0.07); overflow: hidden; }
+.macro-bar-fill {
+  height: 100%; border-radius: 99px; min-width: 0;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.macro-bar-fill.carbs   { background: linear-gradient(90deg, #F2C063, #E09B30); }
+.macro-bar-fill.protein { background: linear-gradient(90deg, #7DD3FC, #38BDF8); }
+.macro-bar-fill.fat     { background: linear-gradient(90deg, #F9A8D4, #EC4899); }
+.macro-bar-fill.over    { background: #E25D7A; }
+.macro-bar-value {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  color: var(--text-secondary); text-align: right; white-space: nowrap;
+}
+.macro-bar-value span { color: var(--text-quaternary); }
+.macro-add-row {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr 1fr auto;
+  gap: 8px; align-items: stretch; margin-bottom: 14px;
+}
+.macro-select, .macro-num-input {
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 10px;
+  font-family: var(--font); font-size: 13px; color: var(--text-primary);
+  transition: border-color 0.15s;
+}
+.macro-select { cursor: pointer; }
+.macro-select:focus, .macro-num-input:focus { outline: none; border-color: var(--accent); background: var(--bg-input-focus); }
+.macro-num-input::placeholder { color: var(--text-quaternary); }
+.macro-add-btn {
+  background: var(--accent); border: none; border-radius: 10px;
+  padding: 9px 16px; font-family: var(--font); font-size: 13px; font-weight: 700;
+  color: #fff; cursor: pointer; white-space: nowrap;
+  transition: opacity 0.15s, transform 0.10s;
+}
+.macro-add-btn:hover { opacity: 0.88; }
+.macro-add-btn:active { transform: scale(0.96); }
+.macro-entries { display: flex; flex-direction: column; gap: 2px; }
+.macro-meal-group { margin-bottom: 8px; }
+.macro-meal-label {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-quaternary); margin-bottom: 4px; padding: 0 2px;
+}
+.macro-entry {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px; background: var(--bg-secondary);
+  transition: background 0.12s;
+}
+.macro-entry:hover { background: rgba(255,255,255,0.05); }
+.macro-entry-macros {
+  flex: 1; font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);
+  white-space: nowrap;
+}
+.macro-entry-cals { font-family: var(--font-mono); font-size: 11px; color: var(--text-quaternary); white-space: nowrap; }
+.macro-entry-del {
+  background: none; border: none; color: var(--text-quaternary);
+  cursor: pointer; font-size: 18px; line-height: 1; padding: 0 2px;
+  transition: color 0.12s;
+}
+.macro-entry-del:hover { color: #E25D7A; }
+.macro-empty {
+  font-size: 13px; color: var(--text-quaternary);
+  text-align: center; padding: 12px 0; font-family: var(--font-mono);
+}
+@media (max-width: 600px) {
+  .macro-add-row {
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  .macro-select { grid-column: 1 / -1; }
+  .macro-add-btn { grid-column: 1 / -1; }
+}
 </style>
 </head>
 <body>
 
 <main>
+  <div class="section-title">Macros</div>
+  <div class="macro-card" id="macroCard">
+    <div class="macro-header">
+      <div class="macro-cal-summary"><strong id="macroTotalCals">0</strong> <span>kcal today</span></div>
+      <button class="macro-goals-btn" id="macroGoalsBtn">Goals ✎</button>
+    </div>
+    <div class="macro-goals-panel" id="macroGoalsPanel">
+      <div class="macro-goals-field">
+        <label for="macroGoalCarbs">Carbs (g)</label>
+        <input type="number" id="macroGoalCarbs" min="0" placeholder="250" />
+      </div>
+      <div class="macro-goals-field">
+        <label for="macroGoalProtein">Protein (g)</label>
+        <input type="number" id="macroGoalProtein" min="0" placeholder="150" />
+      </div>
+      <div class="macro-goals-field">
+        <label for="macroGoalFat">Fat (g)</label>
+        <input type="number" id="macroGoalFat" min="0" placeholder="70" />
+      </div>
+    </div>
+    <div class="macro-bars">
+      <div class="macro-bar-row">
+        <span class="macro-bar-label">Carbs</span>
+        <div class="macro-bar-track"><div class="macro-bar-fill carbs" id="macroBarCarbs" style="width:0%"></div></div>
+        <span class="macro-bar-value" id="macroValCarbs">0 <span>/ 250g</span></span>
+      </div>
+      <div class="macro-bar-row">
+        <span class="macro-bar-label">Protein</span>
+        <div class="macro-bar-track"><div class="macro-bar-fill protein" id="macroBarProtein" style="width:0%"></div></div>
+        <span class="macro-bar-value" id="macroValProtein">0 <span>/ 150g</span></span>
+      </div>
+      <div class="macro-bar-row">
+        <span class="macro-bar-label">Fat</span>
+        <div class="macro-bar-track"><div class="macro-bar-fill fat" id="macroBarFat" style="width:0%"></div></div>
+        <span class="macro-bar-value" id="macroValFat">0 <span>/ 70g</span></span>
+      </div>
+    </div>
+    <div class="macro-add-row">
+      <select class="macro-select" id="macroMealSel">
+        <option value="morning">Morning</option>
+        <option value="lunch">Lunch</option>
+        <option value="evening">Evening</option>
+        <option value="snack">Snack</option>
+      </select>
+      <input class="macro-num-input" type="number" id="macroInputCarbs" placeholder="Carbs g" min="0" />
+      <input class="macro-num-input" type="number" id="macroInputProtein" placeholder="Protein g" min="0" />
+      <input class="macro-num-input" type="number" id="macroInputFat" placeholder="Fat g" min="0" />
+      <button class="macro-add-btn" id="macroAddBtn">+ Add</button>
+    </div>
+    <div class="macro-entries" id="macroEntries"></div>
+  </div>
+
   <div class="section-title">Daily Stack</div>
 
   <div class="stack-card">
@@ -520,6 +692,154 @@ main {
 
   <div class="attribution">// editable template · all data stays in your browser</div>
 </main>
+
+<script>
+(() => {
+  'use strict';
+
+  const MACRO_KEY = 'macro_v1';
+  const MACRO_DEFAULTS = { goals: { carbs: 250, protein: 150, fat: 70 }, entries: {} };
+
+  function macroLoad() {
+    try { return JSON.parse(localStorage.getItem(MACRO_KEY)) || MACRO_DEFAULTS; } catch { return MACRO_DEFAULTS; }
+  }
+  function macroSave(d) { localStorage.setItem(MACRO_KEY, JSON.stringify(d)); }
+
+  function getMacroDateKey() {
+    const now = new Date();
+    if (now.getHours() < 6) now.setDate(now.getDate() - 1);
+    return now.toISOString().slice(0, 10);
+  }
+
+  function macroRender() {
+    const d = macroLoad();
+    const goals = d.goals;
+    const dateKey = getMacroDateKey();
+    const todayEntries = d.entries[dateKey] || [];
+
+    let totC = 0, totP = 0, totF = 0;
+    todayEntries.forEach(e => { totC += e.carbs || 0; totP += e.protein || 0; totF += e.fat || 0; });
+    const totalCals = Math.round(totC * 4 + totP * 4 + totF * 9);
+
+    document.getElementById('macroTotalCals').textContent = totalCals;
+
+    function setBar(fillId, valId, val, goal, cls) {
+      const pct = goal > 0 ? Math.min((val / goal) * 100, 100) : 0;
+      const over = val > goal;
+      const fill = document.getElementById(fillId);
+      fill.style.width = pct + '%';
+      fill.className = 'macro-bar-fill ' + cls + (over ? ' over' : '');
+      document.getElementById(valId).innerHTML = `${Math.round(val)} <span>/ ${goal}g</span>`;
+    }
+    setBar('macroBarCarbs',   'macroValCarbs',   totC, goals.carbs,   'carbs');
+    setBar('macroBarProtein', 'macroValProtein', totP, goals.protein, 'protein');
+    setBar('macroBarFat',     'macroValFat',     totF, goals.fat,     'fat');
+
+    const mealOrder = ['morning', 'lunch', 'evening', 'snack'];
+    const mealLabel = { morning: 'Morning', lunch: 'Lunch', evening: 'Evening', snack: 'Snack' };
+    const grouped = {};
+    todayEntries.forEach(e => {
+      const m = e.meal || 'snack';
+      if (!grouped[m]) grouped[m] = [];
+      grouped[m].push(e);
+    });
+
+    const entriesEl = document.getElementById('macroEntries');
+    if (todayEntries.length === 0) {
+      entriesEl.innerHTML = '<div class="macro-empty">No entries yet — add your first meal above</div>';
+      return;
+    }
+    entriesEl.innerHTML = '';
+    mealOrder.forEach(meal => {
+      if (!grouped[meal] || grouped[meal].length === 0) return;
+      const group = document.createElement('div');
+      group.className = 'macro-meal-group';
+      group.innerHTML = `<div class="macro-meal-label">${mealLabel[meal]}</div>`;
+      grouped[meal].forEach(e => {
+        const cals = Math.round((e.carbs||0)*4 + (e.protein||0)*4 + (e.fat||0)*9);
+        const row = document.createElement('div');
+        row.className = 'macro-entry';
+        row.innerHTML = `
+          <span class="macro-entry-macros">C ${e.carbs||0}g &nbsp; P ${e.protein||0}g &nbsp; F ${e.fat||0}g</span>
+          <span class="macro-entry-cals">${cals} kcal</span>
+          <button class="macro-entry-del" data-id="${e.id}" aria-label="Delete">&times;</button>`;
+        group.appendChild(row);
+      });
+      entriesEl.appendChild(group);
+    });
+  }
+
+  document.getElementById('macroGoalsBtn').addEventListener('click', () => {
+    const panel = document.getElementById('macroGoalsPanel');
+    const d = macroLoad();
+    if (!panel.classList.contains('is-open')) {
+      document.getElementById('macroGoalCarbs').value   = d.goals.carbs;
+      document.getElementById('macroGoalProtein').value = d.goals.protein;
+      document.getElementById('macroGoalFat').value     = d.goals.fat;
+    }
+    panel.classList.toggle('is-open');
+  });
+
+  function saveGoals() {
+    const d = macroLoad();
+    d.goals = {
+      carbs:   parseInt(document.getElementById('macroGoalCarbs').value)   || 0,
+      protein: parseInt(document.getElementById('macroGoalProtein').value) || 0,
+      fat:     parseInt(document.getElementById('macroGoalFat').value)     || 0
+    };
+    macroSave(d);
+    macroRender();
+  }
+  ['macroGoalCarbs','macroGoalProtein','macroGoalFat'].forEach(id => {
+    document.getElementById(id).addEventListener('change', saveGoals);
+    document.getElementById(id).addEventListener('blur', saveGoals);
+  });
+
+  document.getElementById('macroAddBtn').addEventListener('click', () => {
+    const meal    = document.getElementById('macroMealSel').value;
+    const carbs   = parseFloat(document.getElementById('macroInputCarbs').value)   || 0;
+    const protein = parseFloat(document.getElementById('macroInputProtein').value) || 0;
+    const fat     = parseFloat(document.getElementById('macroInputFat').value)     || 0;
+    if (carbs === 0 && protein === 0 && fat === 0) return;
+    const d = macroLoad();
+    const dateKey = getMacroDateKey();
+    if (!d.entries[dateKey]) d.entries[dateKey] = [];
+    d.entries[dateKey].push({
+      id: 'me_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      meal, carbs, protein, fat
+    });
+    macroSave(d);
+    document.getElementById('macroInputCarbs').value   = '';
+    document.getElementById('macroInputProtein').value = '';
+    document.getElementById('macroInputFat').value     = '';
+    macroRender();
+  });
+
+  document.getElementById('macroEntries').addEventListener('click', e => {
+    const btn = e.target.closest('.macro-entry-del');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const d = macroLoad();
+    const dateKey = getMacroDateKey();
+    if (d.entries[dateKey]) {
+      d.entries[dateKey] = d.entries[dateKey].filter(en => en.id !== id);
+      if (d.entries[dateKey].length === 0) delete d.entries[dateKey];
+    }
+    macroSave(d);
+    macroRender();
+  });
+
+  ['macroInputCarbs','macroInputProtein','macroInputFat'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('macroAddBtn').click();
+    });
+  });
+
+  window.addEventListener('storage', e => { if (e.key === MACRO_KEY) macroRender(); });
+
+  macroRender();
+})();
+</script>
 
 <script>
 (() => {
@@ -1041,7 +1361,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (typeof initCloudSync !== 'function') return;
   initCloudSync({
     appKey: 'health',
-    syncedKeys: ['stack:items', 'stack:version', 'stack:low', 'po_water_v1'],
+    syncedKeys: ['stack:items', 'stack:version', 'stack:low', 'po_water_v1', 'macro_v1'],
     syncedPrefixes: ['stack:taken:'],
     onApplied: function () { window.dispatchEvent(new Event('storage')); }
   });
