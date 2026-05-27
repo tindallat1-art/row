@@ -929,6 +929,7 @@ body::after {
   function updateDayRing() {
     const now = new Date();
     const { wake: WAKE_HOUR, sleep: SLEEP_HOUR } = SCHEDULE[now.getDay()];
+    const BEDTIME_HOUR = SLEEP_HOUR - 0.5;
     const hours = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
     const percentEl   = document.getElementById('dayRingPercent');
     const phaseEl     = document.getElementById('dayRingPhase');
@@ -959,7 +960,17 @@ body::after {
       return;
     }
 
-    const span = SLEEP_HOUR - WAKE_HOUR;
+    if (hours >= BEDTIME_HOUR) {
+      fillEl.setAttribute('stroke-dashoffset', 0);
+      fillEl.style.stroke = '#E25D7A';
+      percentEl.textContent = '100%';
+      phaseEl.textContent   = 'BEDTIME';
+      statusEl.textContent  = '🌙 Time for bed!';
+      remainingEl.textContent = 'Bedtime!';
+      return;
+    }
+
+    const span = BEDTIME_HOUR - WAKE_HOUR;
     const percent = (hours - WAKE_HOUR) / span * 100;
     fillEl.setAttribute('stroke-dashoffset', C * (1 - percent / 100));
     fillEl.style.stroke = rgb(paletteAt(percent));
@@ -974,7 +985,7 @@ body::after {
     phaseEl.textContent  = phase;
     statusEl.textContent = status;
 
-    const minsLeft = (SLEEP_HOUR - hours) * 60;
+    const minsLeft = (BEDTIME_HOUR - hours) * 60;
     remainingEl.textContent = formatRemaining(minsLeft) + ' awake time left';
   }
 
