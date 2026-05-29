@@ -70,7 +70,7 @@ body::after {
   margin: 0 0 4px;
   font-size: 32px;
   text-align: center;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.8s ease;
   font-weight: 700;
   letter-spacing: -0.025em;
   background: linear-gradient(180deg, #FFFFFF 0%, #C7C4BC 120%);
@@ -1431,14 +1431,14 @@ document.addEventListener('DOMContentLoaded', function () {
       el.textContent = msgs[idx];
       el.style.opacity = '1';
       idx = (idx + 1) % msgs.length;
-    }, 350);
+    }, 800);
   }
 
   el.textContent = getDate();
   idx = 1;
   fetchWeather();
   setInterval(fetchWeather, 10 * 60 * 1000);
-  setInterval(showNext, 4000);
+  setInterval(showNext, 10000);
 })();
 </script>
 </body>
