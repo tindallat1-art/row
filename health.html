@@ -674,6 +674,7 @@ main {
         <select id="stackAddWindow" class="stack-input stack-select">
           <option value="morning">Morning</option>
           <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
           <option value="evening">Evening</option>
           <option value="anytime">Anytime</option>
         </select>
@@ -868,9 +869,10 @@ main {
   ];
 
   const STACK_WINDOWS = [
-    { key: 'morning', icon: '🌅', title: 'Morning', time: '7–10 AM', cutoffHour: 10 },
-    { key: 'lunch',   icon: '🍽️', title: 'Lunch',   time: '12–2 PM', cutoffHour: 14 },
-    { key: 'evening', icon: '🌙', title: 'Evening', time: '9–11 PM', cutoffHour: 23 },
+    { key: 'morning', icon: '🌅', title: 'Morning', time: '7–10 AM',  cutoffHour: 10   },
+    { key: 'lunch',   icon: '🍽️', title: 'Lunch',   time: '12–2 PM', cutoffHour: 14   },
+    { key: 'dinner',  icon: '🌆', title: 'Dinner',  time: '5–7 PM',  cutoffHour: 19   },
+    { key: 'evening', icon: '🌙', title: 'Evening', time: '9–11 PM', cutoffHour: 23   },
     { key: 'anytime', icon: '⏱️', title: 'Anytime', time: 'No fixed window', cutoffHour: null },
   ];
 
@@ -998,7 +1000,7 @@ main {
     items.push({
       id, name: v,
       dose: String(dose || '').trim(),
-      window: ['morning','lunch','evening','anytime'].includes(windowKey) ? windowKey : 'anytime',
+      window: ['morning','lunch','dinner','evening','anytime'].includes(windowKey) ? windowKey : 'anytime',
       note: String(note || '').trim(),
       tag: null, ordered: true
     });
