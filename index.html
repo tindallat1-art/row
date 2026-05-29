@@ -66,6 +66,17 @@ body::after {
 }
 
 /* ===== Component 1: page title ===== */
+.dash-date {
+  margin: 0 0 4px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  background: linear-gradient(180deg, #FFFFFF 0%, #C7C4BC 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
 .dash-title {
   margin: 0 0 14px;
   font-size: 28px;
@@ -77,7 +88,10 @@ body::after {
   -webkit-text-fill-color: transparent;
   color: transparent;
 }
-@media (max-width: 480px) { .dash-title { font-size: 22px; } }
+@media (max-width: 480px) {
+  .dash-date  { font-size: 26px; }
+  .dash-title { font-size: 22px; }
+}
 
 /* ===== Component 2: Goal Ticker ===== */
 .ticker-row {
@@ -598,6 +612,7 @@ body::after {
 <body>
 <div class="page">
 
+  <div class="dash-date" id="dashDate"></div>
   <h1 class="dash-title">My Dashboard</h1>
 
   <div class="ticker-row">
@@ -1337,6 +1352,11 @@ document.addEventListener('DOMContentLoaded', function () {
       window.dispatchEvent(new Event('storage'));
     }
   });
+});
+</script>
+<script>
+document.getElementById('dashDate').textContent = new Date().toLocaleDateString('en-US', {
+  weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
 });
 </script>
 </body>
