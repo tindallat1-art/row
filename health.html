@@ -583,6 +583,61 @@ main {
   .macro-add-row { grid-template-columns: 1fr 1fr 1fr; }
   .macro-add-btn { grid-column: 1 / -1; }
 }
+
+/* ── Macro 7-Day History Chart ─────────────────────────── */
+.macro-history {
+  margin-bottom: 16px;
+  padding: 12px 12px 8px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.macro-history-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.macro-history-title {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-tertiary);
+}
+.macro-history-legend { display: flex; gap: 8px; }
+.macro-history-legend-item {
+  display: flex; align-items: center; gap: 3px;
+  font-family: var(--font-mono); font-size: 9px; color: var(--text-quaternary);
+}
+.macro-history-legend-dot { width: 6px; height: 6px; border-radius: 50%; }
+.macro-history-legend-dot.carbs   { background: #E09B30; }
+.macro-history-legend-dot.protein { background: #38BDF8; }
+.macro-history-legend-dot.fat     { background: #EC4899; }
+.macro-history-chart {
+  display: flex; gap: 5px; align-items: flex-end;
+  height: 72px; position: relative;
+}
+.macro-history-goal-line {
+  position: absolute; left: 0; right: 0;
+  border-top: 1px dashed rgba(255,255,255,0.14);
+  pointer-events: none; z-index: 1;
+}
+.macro-history-col {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  height: 100%;
+}
+.macro-history-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+.macro-history-bar {
+  width: 100%; border-radius: 3px 3px 0 0;
+  display: flex; flex-direction: column-reverse; overflow: hidden; min-height: 0;
+  transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.macro-history-bar.empty-bar { height: 2px !important; background: rgba(255,255,255,0.06); border-radius: 3px; }
+.macro-history-bar > div { flex-shrink: 0; }
+.mhb-carbs   { background: linear-gradient(180deg, #D08A20, #F2C063); }
+.mhb-protein { background: linear-gradient(180deg, #29A8E0, #7DD3FC); }
+.mhb-fat     { background: linear-gradient(180deg, #D03080, #F9A8D4); }
+.macro-history-day {
+  font-family: var(--font-mono); font-size: 9px; flex-shrink: 0;
+  color: var(--text-quaternary); text-transform: uppercase; letter-spacing: 0.06em;
+}
+.macro-history-col.is-today .macro-history-day { color: var(--text-secondary); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -590,6 +645,17 @@ main {
 <main>
   <div class="section-title">Macros</div>
   <div class="macro-card" id="macroCard">
+    <div class="macro-history">
+      <div class="macro-history-head">
+        <span class="macro-history-title">7-Day Overview</span>
+        <div class="macro-history-legend">
+          <span class="macro-history-legend-item"><span class="macro-history-legend-dot carbs"></span>Carbs</span>
+          <span class="macro-history-legend-item"><span class="macro-history-legend-dot protein"></span>Protein</span>
+          <span class="macro-history-legend-item"><span class="macro-history-legend-dot fat"></span>Fat</span>
+        </div>
+      </div>
+      <div class="macro-history-chart" id="macroHistoryChart"></div>
+    </div>
     <div class="macro-header">
       <div class="macro-cal-summary"><strong id="macroTotalCals">0</strong> <span>kcal today</span></div>
       <button class="macro-goals-btn" id="macroGoalsBtn">Goals ✎</button>
@@ -712,7 +778,72 @@ main {
     return `${y}-${m}-${d}`;
   }
 
+  function macroHistoryRender() {
+    const d = macroLoad();
+    const goals = d.goals;
+    const goalCals = goals.carbs * 4 + goals.protein * 4 + goals.fat * 9;
+
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const dt = new Date();
+      if (dt.getHours() < 6) dt.setDate(dt.getDate() - 1);
+      dt.setDate(dt.getDate() - i);
+      const y = dt.getFullYear();
+      const mo = String(dt.getMonth() + 1).padStart(2, '0');
+      const dy = String(dt.getDate()).padStart(2, '0');
+      const key = `${y}-${mo}-${dy}`;
+      const entries = d.entries[key] || [];
+      let carbs = 0, protein = 0, fat = 0;
+      entries.forEach(e => { carbs += e.carbs||0; protein += e.protein||0; fat += e.fat||0; });
+      const cals = carbs * 4 + protein * 4 + fat * 9;
+      const label = dt.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2);
+      days.push({ carbs, protein, fat, cals, label, isToday: i === 0 });
+    }
+
+    const maxCals = Math.max(goalCals, ...days.map(day => day.cals), 100);
+    const chartEl = document.getElementById('macroHistoryChart');
+    chartEl.innerHTML = '';
+
+    const goalPct = Math.min((goalCals / maxCals) * 100, 100);
+    const goalLine = document.createElement('div');
+    goalLine.className = 'macro-history-goal-line';
+    goalLine.style.bottom = goalPct + '%';
+    chartEl.appendChild(goalLine);
+
+    days.forEach(day => {
+      const col = document.createElement('div');
+      col.className = 'macro-history-col' + (day.isToday ? ' is-today' : '');
+
+      const barWrap = document.createElement('div');
+      barWrap.className = 'macro-history-bar-wrap';
+
+      const bar = document.createElement('div');
+      bar.className = 'macro-history-bar';
+
+      if (day.cals > 0) {
+        bar.style.height = Math.min((day.cals / maxCals) * 100, 100) + '%';
+        bar.innerHTML = `
+          <div class="mhb-carbs"   style="flex:${day.carbs * 4}"></div>
+          <div class="mhb-protein" style="flex:${day.protein * 4}"></div>
+          <div class="mhb-fat"     style="flex:${day.fat * 9}"></div>`;
+      } else {
+        bar.classList.add('empty-bar');
+      }
+
+      barWrap.appendChild(bar);
+      col.appendChild(barWrap);
+
+      const lbl = document.createElement('span');
+      lbl.className = 'macro-history-day';
+      lbl.textContent = day.label;
+      col.appendChild(lbl);
+
+      chartEl.appendChild(col);
+    });
+  }
+
   function macroRender() {
+    macroHistoryRender();
     const d = macroLoad();
     const goals = d.goals;
     const dateKey = getMacroDateKey();
