@@ -22,6 +22,11 @@
   --text-secondary: #B8B6B0;
   --text-tertiary: #76746E;
   --text-quaternary: #4D4B47;
+  --bg-dropdown: rgba(15, 15, 18, 0.96);
+  --accent: #1D9E75;
+  --accent-glow: rgba(29, 158, 117, 0.35);
+  --tag-stack: #D8AB30;
+  --tag-stack-bg: rgba(216, 171, 48, 0.15);
   --success: #6BE3A4;
   --warning: #F2C063;
   --danger: #FF6B6B;
@@ -46,23 +51,19 @@ body {
   padding: max(28px, env(safe-area-inset-top)) 20px 60px;
 }
 body::before {
-  content: '';
-  position: fixed; inset: 0;
+  content: ''; position: fixed; inset: 0;
   background:
-    radial-gradient(circle at 82% 14%, rgba(224, 118, 88, 0.16), transparent 45%),
-    radial-gradient(circle at 18% 90%, rgba(180, 180, 200, 0.06), transparent 50%);
+    radial-gradient(60% 50% at 82% 14%, rgba(224, 118, 88, 0.16) 0%, transparent 60%),
+    radial-gradient(50% 40% at 18% 90%, rgba(180, 180, 200, 0.06) 0%, transparent 60%);
   filter: blur(40px);
-  pointer-events: none;
-  z-index: -2;
+  pointer-events: none; z-index: 0;
   animation: drift 36s ease-in-out infinite alternate;
 }
 body::after {
-  content: '';
-  position: fixed; inset: 0;
+  content: ''; position: fixed; inset: 0;
   background-image: radial-gradient(rgba(255,255,255,0.014) 1px, transparent 1px);
   background-size: 3px 3px;
-  pointer-events: none;
-  z-index: -1;
+  pointer-events: none; z-index: 1;
 }
 @keyframes drift {
   0%   { transform: translate3d(0,0,0); }
@@ -205,6 +206,7 @@ body::after {
   margin-bottom: 22px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(24px) saturate(1.2);
   -webkit-backdrop-filter: blur(24px) saturate(1.2);
   box-shadow: 0 12px 40px rgba(0,0,0,0.45);
@@ -286,6 +288,7 @@ body::after {
 .gm-card {
   position: relative;
   background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 14px;
