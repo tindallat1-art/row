@@ -633,11 +633,42 @@ main {
 .mhb-carbs   { background: linear-gradient(180deg, #D08A20, #F2C063); }
 .mhb-protein { background: linear-gradient(180deg, #29A8E0, #7DD3FC); }
 .mhb-fat     { background: linear-gradient(180deg, #D03080, #F9A8D4); }
+.macro-history-cal {
+  font-family: var(--font-mono); font-size: 8px; flex-shrink: 0;
+  color: var(--text-quaternary); white-space: nowrap;
+}
+.macro-history-col.is-today .macro-history-cal,
+.macro-history-col.is-selected .macro-history-cal { color: var(--text-tertiary); }
 .macro-history-day {
   font-family: var(--font-mono); font-size: 9px; flex-shrink: 0;
   color: var(--text-quaternary); text-transform: uppercase; letter-spacing: 0.06em;
 }
 .macro-history-col.is-today .macro-history-day { color: var(--text-secondary); font-weight: 700; }
+.macro-history-col.is-selected .macro-history-bar:not(.empty-bar) {
+  outline: 1px solid rgba(255,255,255,0.22); outline-offset: 1px;
+}
+.macro-history-col { cursor: pointer; }
+.macro-history-detail {
+  display: none; margin-top: 8px; padding: 9px 11px;
+  background: rgba(255,255,255,0.035); border-radius: 8px; border: 1px solid var(--border);
+  gap: 2px; flex-direction: column;
+}
+.macro-history-detail.is-visible { display: flex; }
+.macro-history-detail-top {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 10px; margin-bottom: 4px;
+}
+.macro-history-detail-day { color: var(--text-secondary); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.macro-history-detail-cals { color: var(--text-tertiary); }
+.macro-history-detail-macros { display: flex; gap: 12px; }
+.macro-history-detail-macro {
+  display: flex; align-items: center; gap: 4px;
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-quaternary);
+}
+.macro-history-detail-macro strong { font-weight: 700; }
+.macro-history-detail-macro.carbs   strong { color: #E09B30; }
+.macro-history-detail-macro.protein strong { color: #38BDF8; }
+.macro-history-detail-macro.fat     strong { color: #EC4899; }
 </style>
 </head>
 <body>
@@ -655,6 +686,17 @@ main {
         </div>
       </div>
       <div class="macro-history-chart" id="macroHistoryChart"></div>
+      <div class="macro-history-detail" id="macroHistoryDetail">
+        <div class="macro-history-detail-top">
+          <span class="macro-history-detail-day" id="mhdDay"></span>
+          <span class="macro-history-detail-cals" id="mhdCals"></span>
+        </div>
+        <div class="macro-history-detail-macros">
+          <span class="macro-history-detail-macro carbs"><strong id="mhdCarbPct"></strong> carbs</span>
+          <span class="macro-history-detail-macro protein"><strong id="mhdProtPct"></strong> protein</span>
+          <span class="macro-history-detail-macro fat"><strong id="mhdFatPct"></strong> fat</span>
+        </div>
+      </div>
     </div>
     <div class="macro-header">
       <div class="macro-cal-summary"><strong id="macroTotalCals">0</strong> <span>kcal today</span></div>
@@ -797,7 +839,8 @@ main {
       entries.forEach(e => { carbs += e.carbs||0; protein += e.protein||0; fat += e.fat||0; });
       const cals = carbs * 4 + protein * 4 + fat * 9;
       const label = dt.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2);
-      days.push({ carbs, protein, fat, cals, label, isToday: i === 0 });
+      const fullLabel = dt.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+      days.push({ carbs, protein, fat, cals, label, fullLabel, isToday: i === 0 });
     }
 
     const maxCals = Math.max(goalCals, ...days.map(day => day.cals), 100);
@@ -810,9 +853,40 @@ main {
     goalLine.style.bottom = goalPct + '%';
     chartEl.appendChild(goalLine);
 
-    days.forEach(day => {
+    const detailEl  = document.getElementById('macroHistoryDetail');
+    const mhdDay    = document.getElementById('mhdDay');
+    const mhdCals   = document.getElementById('mhdCals');
+    const mhdCarbPct = document.getElementById('mhdCarbPct');
+    const mhdProtPct = document.getElementById('mhdProtPct');
+    const mhdFatPct  = document.getElementById('mhdFatPct');
+
+    function showDetail(day) {
+      const cals = Math.round(day.cals);
+      const carbCals = Math.round(day.carbs * 4);
+      const protCals = Math.round(day.protein * 4);
+      const fatCals  = Math.round(day.fat * 9);
+      const cp = cals > 0 ? Math.round(carbCals / cals * 100) : 0;
+      const pp = cals > 0 ? Math.round(protCals / cals * 100) : 0;
+      const fp = cals > 0 ? 100 - cp - pp : 0;
+      mhdDay.textContent  = day.fullLabel;
+      mhdCals.textContent = cals > 0 ? `${cals.toLocaleString()} kcal` : 'No data';
+      mhdCarbPct.textContent  = cals > 0 ? cp + '%'  : '—';
+      mhdProtPct.textContent  = cals > 0 ? pp + '%'  : '—';
+      mhdFatPct.textContent   = cals > 0 ? Math.max(fp,0) + '%' : '—';
+      detailEl.classList.add('is-visible');
+    }
+
+    days.forEach((day, idx) => {
       const col = document.createElement('div');
       col.className = 'macro-history-col' + (day.isToday ? ' is-today' : '');
+
+      // Calorie label above bar
+      const calLbl = document.createElement('span');
+      calLbl.className = 'macro-history-cal';
+      calLbl.textContent = day.cals > 0
+        ? (day.cals >= 1000 ? (day.cals / 1000).toFixed(1) + 'k' : Math.round(day.cals))
+        : '—';
+      col.appendChild(calLbl);
 
       const barWrap = document.createElement('div');
       barWrap.className = 'macro-history-bar-wrap';
@@ -837,6 +911,12 @@ main {
       lbl.className = 'macro-history-day';
       lbl.textContent = day.label;
       col.appendChild(lbl);
+
+      col.addEventListener('click', () => {
+        chartEl.querySelectorAll('.macro-history-col').forEach(c => c.classList.remove('is-selected'));
+        col.classList.add('is-selected');
+        showDetail(day);
+      });
 
       chartEl.appendChild(col);
     });
