@@ -10,9 +10,18 @@
 <script src="topbar.js" defer></script>
 <style>
 :root {
+  --bg: #050506;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-secondary: rgba(255, 255, 255, 0.035);
+  --bg-input: rgba(0, 0, 0, 0.28);
+  --bg-input-focus: rgba(0, 0, 0, 0.36);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-soft: rgba(255, 255, 255, 0.04);
+  --border-strong: rgba(255, 255, 255, 0.12);
   --text-primary: #FAFAFA;
   --text-secondary: #B8B6B0;
   --text-tertiary: #76746E;
+  --text-quaternary: #4D4B47;
   --success: #6BE3A4;
   --warning: #F2C063;
   --danger: #FF6B6B;
@@ -23,7 +32,7 @@
 * { box-sizing: border-box; }
 html, body {
   margin: 0; padding: 0;
-  background: #050506;
+  background: var(--bg);
   color: var(--text-secondary);
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
@@ -63,6 +72,8 @@ body::after {
 .page {
   max-width: 1100px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 /* ===== Component 1: page title ===== */
@@ -340,6 +351,8 @@ body::after {
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
   border: 1px solid rgba(255,255,255,0.06);
   color: var(--text-tertiary);
   font-size: 11px; font-weight: 600;
