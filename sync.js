@@ -65,9 +65,8 @@
           const local = localStorage.getItem(k);
           if (local !== incoming) { try { origSet(k, incoming); changed = true; } catch (e) {} }
         }
-        for (const k of listAllKeys()) {
-          if (!(k in remote)) { try { origRemove(k); changed = true; } catch (e) {} }
-        }
+        // Never delete local keys that are absent from remote — remote may have been
+        // saved from a different device that didn't have that data yet.
       } finally { suppressSync = false; }
       if (changed && typeof onApplied === 'function') { try { onApplied(); } catch (e) {} }
       return changed;
